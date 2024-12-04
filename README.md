@@ -14,7 +14,17 @@ This project uses **Chainlink price feeds** to fetch the real-time price of Sola
 ---
 
 ## **Live Demo**
-🚀 **[View the Live Demo](<INSERT_LINK_HERE>)**
+🚀 **[View the Live Demo](https://solana-price-prediction.vercel.app/)**
+
+Note: The Demo contains a Prediction Market Initialized by me so no one else can really test it out fully.
+To create a new Prediction Market, simply enable the **Create Prediction Market** button then execute it,
+it should console log the created market's account. Then add the address to **PredictionMarket.tsx L-17**.
+Now you can use the Create Prediction section to create new predictions that users can interact with. ( We're working on better UX :) ).
+
+```bash
+   // replace this part with your newly created Prediction Market Address
+   const predictionMarketPubKey = "xxxxxxxxxxxxxxxxxxxxxxxx"
+```
 
 ---
 

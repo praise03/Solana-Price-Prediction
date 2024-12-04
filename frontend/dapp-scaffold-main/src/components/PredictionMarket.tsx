@@ -22,6 +22,7 @@ export const PredictionMarket: FC = () => {
     const ourWallet = useWallet();
 
 
+    // for the "ends at" part, we use the imported dayjs library
     dayjs().format()
     var relativeTime = require("dayjs/plugin/relativeTime");
     dayjs.extend(relativeTime)
@@ -210,6 +211,8 @@ export const PredictionMarket: FC = () => {
         }
     }
 
+
+    //to text the price fetching, calls execute
     async function getPrice() {
         const sol_devnet = new web3.PublicKey("99B2bTijsU6f1GCT73HmdR7HCFFjGMBcPZY6jZ96ynrR")
         const chainlink_program = new web3.PublicKey("HEvSKofvBgfaexv23kMabbYqxasxU3mQ4ibBMEmJWHny")
@@ -246,22 +249,25 @@ export const PredictionMarket: FC = () => {
             <div className="relative group items-center">
                 <div className="m-1 absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 
                 rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+                {/* You should only enable this button at the point of initialization to create the PredictionMarket
+                the predictionMarket is initialized once in the program lifespan */}
                 <button
+                    disabled
                     className="group w-60 m-2 btn animate-pulse bg-gradient-to-br from-indigo-500 to-fuchsia-500 hover:from-white hover:to-purple-300 text-black"
                     onClick={createPredictionMarket}
                 >
-                    <span className="block group-disabled:hidden" >
-                        Get owner
+                    <span className="block text-white " >
+                        Create Prediction Market (Enable to use)
                     </span>
                 </button>
             </div>
 
-            <h2 className='font-extrabold text-2xl p-4'>Predictions</h2>
-            <div className='p-10 text-center flex flex-row space-x-8'>
+            <h2 className='font-extrabold text-2xl p-4'>PREDICTIONS</h2>
+            <div className='p-8 text-center flex flex-row space-x-8'>
                
-
+                {/* Logic to fetch all predictions in our marketplace */}
                 {predictions && predictions.map((prediction) => (
-                    <div key={prediction.publicKey} className="w-full p-4 max-w-sm backdrop-blur-sm bg-white/20 hover:backdrop-blur-lg rounded-md">
+                    <div key={prediction.publicKey} className="w-full p-4 backdrop-blur-sm bg-white/20 hover:backdrop-blur-lg rounded-md">
 
                         <div className="flex flex-col items-center pb-10 w-max">
                             <img className="w-24 h-24 mb-3 rounded-full shadow-lg" src="https://images.unsplash.com/photo-1639843885527-43b098a9661a" alt="Coin image" />
@@ -296,9 +302,12 @@ export const PredictionMarket: FC = () => {
                 ))}
 
             </div>
+            
 
+            {/* Should be hidden by default, but i decided to leave it
+            Used by the Admin to create new predictions that users can bet on */}
             <div className='w-2/4 justify-center place-self-center'>
-                <h2 className='text-xl font-bold'>Create Prediction (Admin Only)</h2>
+                <h2 className='text-xl font-bold mb-2'>Create Prediction (Admin Only)</h2>
                 <div className="flex p-1">
                     <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                         <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
