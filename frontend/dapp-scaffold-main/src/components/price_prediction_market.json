@@ -1,0 +1,418 @@
+{
+  "address": "A83FGFK76LfLQTESqJJ1B2FGTU86PbbbxCXS7ibAw7r3",
+  "metadata": {
+    "name": "price_prediction_market",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "create_prediction",
+      "discriminator": [
+        186,
+        30,
+        192,
+        149,
+        194,
+        124,
+        119,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "prediction_market",
+          "writable": true
+        },
+        {
+          "name": "prediction",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  101,
+                  100,
+                  105,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "prediction_market"
+              },
+              {
+                "kind": "account",
+                "path": "prediction_market.prediction_count",
+                "account": "PredictionMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "bet",
+          "type": "string"
+        },
+        {
+          "name": "end_timestamp",
+          "type": "i64"
+        },
+        {
+          "name": "sol_value",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "determine_actual_outcome",
+      "discriminator": [
+        64,
+        169,
+        230,
+        124,
+        115,
+        230,
+        212,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "prediction",
+          "writable": true
+        },
+        {
+          "name": "bet",
+          "writable": true
+        },
+        {
+          "name": "chainlink_feed"
+        },
+        {
+          "name": "chainlink_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "execute",
+      "discriminator": [
+        130,
+        221,
+        242,
+        154,
+        13,
+        193,
+        189,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "chainlink_feed"
+        },
+        {
+          "name": "chainlink_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_prediction_market",
+      "discriminator": [
+        248,
+        70,
+        198,
+        224,
+        224,
+        105,
+        125,
+        195
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "prediction_market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  101,
+                  100,
+                  105,
+                  99,
+                  116,
+                  105,
+                  111,
+                  110,
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "place_bet",
+      "discriminator": [
+        222,
+        62,
+        67,
+        220,
+        63,
+        166,
+        126,
+        33
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "prediction",
+          "writable": true
+        },
+        {
+          "name": "bet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "prediction"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "outcome",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Bet",
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
+    },
+    {
+      "name": "Prediction",
+      "discriminator": [
+        98,
+        127,
+        141,
+        187,
+        218,
+        33,
+        8,
+        14
+      ]
+    },
+    {
+      "name": "PredictionMarket",
+      "discriminator": [
+        117,
+        150,
+        97,
+        152,
+        119,
+        58,
+        51,
+        58
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "OnlyOwner",
+      "msg": "OnlyOwner: Only the owner can call this function."
+    },
+    {
+      "code": 6001,
+      "name": "PredictionEnded",
+      "msg": "Prediction has ended."
+    },
+    {
+      "code": 6002,
+      "name": "PredictionPending",
+      "msg": "Prediction has not ended."
+    },
+    {
+      "code": 6003,
+      "name": "PredictionBetMismatch",
+      "msg": "Bet Account Does Not Match Prediction."
+    },
+    {
+      "code": 6004,
+      "name": "BetConcluded",
+      "msg": "Bet has been concluded"
+    }
+  ],
+  "types": [
+    {
+      "name": "Bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "prediction",
+            "type": "pubkey"
+          },
+          {
+            "name": "outcome",
+            "type": "bool"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "concluded",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Prediction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "prediction_market",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "prediction_id",
+            "type": "u64"
+          },
+          {
+            "name": "bet",
+            "type": "string"
+          },
+          {
+            "name": "end_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "yes_count",
+            "type": "u64"
+          },
+          {
+            "name": "no_count",
+            "type": "u64"
+          },
+          {
+            "name": "sol_value",
+            "type": "u64"
+          },
+          {
+            "name": "actual_outcome",
+            "type": {
+              "option": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PredictionMarket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "prediction_count",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+use anchor_lang::prelude::*;
+
+declare_id!("A83FGFK76LfLQTESqJJ1B2FGTU86PbbbxCXS7ibAw7r3");
+
+#[program]
+pub mod price_prediction_market {
+    use super::*;
+
+
+    pub fn initialize_prediction_market(ctx: Context<InitializePredictionMarket>) -> Result<()> {
+        let prediction_market = &mut ctx.accounts.prediction_market;
+        prediction_market.owner = ctx.accounts.signer.key();
+        Ok(())
+    }
+
+    pub fn create_prediction(ctx: Context<CreatePrediction>, bet: String, end_timestamp: i64) -> Result<()>{
+        let prediction_market = &ctx.accounts.prediction_market;
+
+        // Manual ownership check
+        require!(
+            prediction_market.owner == ctx.accounts.signer.key(),
+            CustomError::OnlyOwner
+        );
+        
+        let prediction = &mut ctx.accounts.prediction;
+
+        // Set prediction data
+        prediction.prediction_market = ctx.accounts.prediction_market.key();
+        prediction.owner = ctx.accounts.signer.key();
+        prediction.bet = bet;
+        prediction.end_timestamp = end_timestamp;
+        prediction.yes_count = 0;
+        prediction.no_count = 0;
+
+        Ok(())
+    }
+
+    pub fn place_bet(ctx: Context<PlaceBet>, outcome: bool, amount: u64) -> Result<()> {
+        let prediction = &mut ctx.accounts.prediction;
+
+        // Ensure prediction is still active
+        require!(
+            Clock::get()?.unix_timestamp < prediction.end_timestamp,
+            CustomError::PredictionEnded
+        );
+
+        let bet = &mut ctx.accounts.bet;
+        bet.user = ctx.accounts.signer.key();
+        bet.prediction = prediction.key();
+        bet.outcome = outcome; // true = "yes", false = "no"
+        bet.amount = amount;
+
+        // Update total bets for the chosen outcome
+        if outcome {
+            prediction.yes_count += 1;
+        } else {
+            prediction.no_count += 1;
+        }
+
+        msg!(
+            "Bet placed by {} on '{}' outcome: {} ({} lamports)",
+            ctx.accounts.signer.key(),
+            prediction.bet,
+            if outcome { "yes" } else { "no" },
+            amount
+        );
+
+        Ok(())
+    }
+
+    pub fun determine_outcome()
+
+}
+
+#[derive(Accounts)]
+pub struct InitializePredictionMarket<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        init, // initialize account
+        payer = signer, // who will pay for account initialization
+        space = 8 + 32 // how much space we need for data
+    )]
+    pub prediction_market: Account<'info, PredictionMarket>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct PredictionMarket {
+    pub owner: Pubkey
+}
+
+#[account]
+pub struct Prediction {
+    pub prediction_market: Pubkey,   // Our prediction market
+    pub owner: Pubkey,    // Owner of the prediction (market owner by default)
+    pub bet: String, // Prediction
+    pub end_timestamp: i64,    // Prediction end time
+    pub yes_count: u64,    // Total count for "yes"
+    pub no_count: u64,     // Total count for "no"
+}
+
+#[derive(Accounts)]
+pub struct CreatePrediction<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    #[account(mut)]
+    pub prediction_market: Account<'info, PredictionMarket>,
+    #[account(init, payer = signer, space = 8 + 32 + 128 + 8 + 8 + 8)] // Example space for prediction
+    pub prediction: Account<'info, Prediction>,
+    
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct Bet {
+    pub user: Pubkey,       // User placing the bet
+    pub prediction: Pubkey, // Associated prediction
+    pub outcome: bool,      // true = "yes", false = "no"
+    pub amount: u64,        // Bet amount
+}
+
+#[derive(Accounts)]
+pub struct PlaceBet<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+    #[account(mut)]
+    pub prediction: Account<'info, Prediction>,
+    #[account(init, payer = signer, space = 8 + 32 + 32 + 1 + 8)] // Example space for bet
+    pub bet: Account<'info, Bet>,
+    
+    pub system_program: Program<'info, System>,
+}
+
+#[error_code]
+pub enum CustomError {
+    #[msg("OnlyOwner: Only the owner can call this function.")]
+    OnlyOwner,
+    #[msg("Prediction has ended.")]
+    PredictionEnded,
+}
